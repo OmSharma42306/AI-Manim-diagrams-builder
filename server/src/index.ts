@@ -48,8 +48,9 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
           
           const rawCode = response?.choices[0]?.message?.content;
           // @ts-ignore
-          const cleanedCode = sanitizeManimCode(rawCode);
+          const cleanedCode = sanitizeManimCode2(rawCode);
 
+        //   const secondSanitized = sanitizeManimCode2(cleanedCode)
           console.log(cleanedCode);
 
 
@@ -83,6 +84,24 @@ function sanitizeManimCode(raw: string): string {
       .trim();
   }
 
+  function sanitizeManimCode2(raw: string): string {
+    // Extract code inside triple backticks or from the first class definition
+    const codeBlockMatch = raw.match(/```(?:python)?\s*([\s\S]*?)```/i);
+    if (codeBlockMatch) {
+      return codeBlockMatch[1].trim();
+    }
+  
+    // Fallback: extract from the class definition forward
+    const classIndex = raw.indexOf("class GeneratedScene");
+    if (classIndex !== -1) {
+      const pre = "from manim import *\n\n";
+      return pre + raw.slice(classIndex).trim();
+    }
+  
+    // Fallback: return the whole thing trimmed (last resort)
+    return raw.trim();
+  }
+  
 
 
 function readFile(filePath:string):string|null{
