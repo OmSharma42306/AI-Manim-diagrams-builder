@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
-
+import { sendPrompt } from '../api/api';
 interface PromptInputProps {
   onSubmit: (prompt: string) => void;
   isProcessing: boolean;
@@ -14,10 +14,15 @@ const PromptInput: React.FC<PromptInputProps> = ({
 }) => {
   const [prompt, setPrompt] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (prompt.trim() && !isProcessing) {
-      onSubmit(prompt.trim());
+      onSubmit(
+      await sendPrompt(prompt.trim())
+      
+    
+    );
+
     }
   };
 

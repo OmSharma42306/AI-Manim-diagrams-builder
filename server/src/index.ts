@@ -25,6 +25,7 @@ const together = new Together({
 
 app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
     const prompt:string = req.body.prompt;
+    console.log(prompt)
     
     const path = './src/prompts/system_prompts.txt'
     const readfile:string|null = readFile(path);
@@ -38,7 +39,7 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
         const response = await together.chat.completions.create({
             messages: [
                 {"role": "system", "content": systemPrompt},
-                {"role": "user", "content": "Create a Manim animation using a CreateCircle"}],
+                {"role": "user", "content": prompt}],
             model:"mistralai/Mixtral-8x7B-Instruct-v0.1"
             //  "Qwen/Qwen3-235B-A22B-fp8-tput"
             
