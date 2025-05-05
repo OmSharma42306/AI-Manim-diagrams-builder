@@ -82,7 +82,7 @@ function sanitizeManimCode(raw: string): string {
       .replace(/NEW_COMMAND_[^\n\r]*/g, '') // remove weird LLM artifacts
       .trim();
   }
-  
+
 
 
 function readFile(filePath:string):string|null{
