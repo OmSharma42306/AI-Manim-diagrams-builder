@@ -13,10 +13,12 @@
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/glob": "^8.1.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "glob": "^11.0.2",
     "together-ai": "^0.16.0"
   }
 }

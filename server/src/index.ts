@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import Together from "together-ai";
 import * as fs from "fs";
 import path from 'path';
+import { exec } from 'child_process';
+import {glob} from 'glob';
 
 
 dotenv.config()
@@ -32,17 +34,13 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
     //@ts-ignore
     const systemPrompt:string = readfile;
     try{
-        const newx = readFile('./src/generate.py')
-        console.log("NEXZZ",newx)
-
+        
         // sending prompt to llm
         const response = await together.chat.completions.create({
             messages: [
                 {"role": "system", "content": systemPrompt},
                 {"role": "user", "content": prompt}],
-            model:"mistralai/Mixtral-8x7B-Instruct-v0.1"
-            //  "Qwen/Qwen3-235B-A22B-fp8-tput"
-            
+            model:"mistralai/Mixtral-8x7B-Instruct-v0.1"    
           });
           
           
@@ -53,19 +51,44 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
         //   const secondSanitized = sanitizeManimCode2(cleanedCode)
           console.log(cleanedCode);
 
-
-
           //res.json({msg:response?.choices[0]?.message?.content})
           
         
-        //  fs.writeFileSync(outputPath, cleanedCode);
-        // fs.writeFileSync('./src/generate.py',cleanedCode)
+        
         fs.writeFileSync('.././manim-runner/manimations/main.py',cleanedCode)  
-        // .././
-          
+        
+     
+
           
           console.log('written to main.py');
-          res.json(cleanedCode)
+
+          const filePath = '../manim-runner/manimations/main.py';
+          
+          // runManim((err, outputPath) => {
+          //   if (err || !outputPath) {
+          //     return res.status(500).json({ error: 'Manim failed to render the video.' });
+          //   }
+      
+          //   res.sendFile(outputPath, err => {
+          //     if (err) {
+          //       console.error("Error sending file:", err);
+          //       res.status(500).end();
+          //     } else {
+          //       console.log("✅ Video sent.");
+          //     }
+          //   });
+          // });
+          runManim((error, videoPath) => {
+            if (error || !videoPath) {
+              return res.status(500).json({ error: "Failed to render video" });
+            }
+        
+  
+        
+            res.json({ url: "" });
+          });
+          
+          //res.json(cleanedCode)
           return;
     
     }catch(error){
@@ -74,6 +97,64 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
     }
 })
 
+
+
+
+  // todo working..
+
+  const runManim = async (callback: (error: any, outputPath?: string) => void) => {
+    const workingDir = path.resolve('../manim-runner/manimations');
+    const destinDir = '../videos'
+    const command = `manim -pql main.py GeneratedScene --format=mp4`;
+
+    exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Manim execution error: ${stderr}`);
+        return callback(error);
+      }
+
+      try {
+        console.log("i am hrere")
+        // const pattern = path.join(workingDir, 'media/videos/main/**/GeneratedScene.mp4');
+        const pattern = path.join(workingDir, destinDir);
+        
+        // console.log("Pattern: ",pattern)
+        // const files = await glob(pattern);
+        // console.log("Files: ",files)
+        // if (files.length === 0) {
+        //   return callback(new Error(" Rendered video not found"));
+        // }
+
+        // const renderedPath = files[0];
+        // const destinationPath = path.resolve('../videos/GeneratedScene.mp4');
+
+        // fs.copyFile(renderedPath, destinationPath, (copyErr) => {
+        //   if (copyErr) {
+        //     console.error("Error copying file:", copyErr);
+        //     return callback(copyErr);
+        //   }
+
+        //   console.log(" Video copied to:", destinationPath);
+       //   callback(null, destinationPath);
+        //});
+      } catch (globErr) {
+        return callback(globErr);
+      }
+      // Directly return the expected output path (don't glob)
+      // const outputPath = path.join(
+      //   workingDir,
+      //   'media',
+      //   'videos',
+      //   'main',
+      //   '480p15',
+      //   'GeneratedScene.mp4'
+      // );
+
+      // console.log("Video generated at:", outputPath);
+      
+//      callback(null, outputPath);
+    });
+  };
 
 
 function sanitizeManimCode(raw: string): string {
