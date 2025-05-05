@@ -1,20 +1,11 @@
-import { useState } from 'react'
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
-import DiagramGallery from './components/DiagramGallery';
 import HowItWorks from './components/HowItWorks';
 import Footer from './components/Footer';
 
 
 function App() {
-  const [prompt, setPrompt] = useState<string>("");
-
-
-  async function handleSendPrompt(){
-    // add stuff
-  }
-
 
   return (
     <div>
@@ -23,23 +14,11 @@ function App() {
       <main>
         <Hero />
         <Features />
-        {/* <DiagramGallery /> */}
         <HowItWorks />
       </main>
       <Footer />
     </div>
     </div>
-    // <>
-    // <h1>Enter Prompt</h1>
-    // <br />
-    // <input type="text" placeholder='Enter Prompt' onChange={(e)=>{
-    //   setPrompt(e.target.value);
-    // }} />
-    // <br />
-    // <button onClick={handleSendPrompt}>Send</button>
-
-
-    // </>
   )
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Github, Twitter, Linkedin } from 'lucide-react';
+import { Activity, Github, Twitter, Linkedin,EarthIcon } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
                 <Twitter className="h-5 w-5" />
               </a>
               <a href="https://latest-portofolio.vercel.app/" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
-                Portfolio
+              <EarthIcon className="h-5 w-5" ></EarthIcon>
               </a>
               <a href="https://www.linkedin.com/in/om-sharma-846733273" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
                 <Linkedin className="h-5 w-5" />
