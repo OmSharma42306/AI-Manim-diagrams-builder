@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Github, Twitter, Facebook, Linkedin } from 'lucide-react';
+import { Activity, Github, Twitter, Linkedin } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -9,22 +9,22 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <div className="flex items-center">
               <Activity className="h-8 w-8 text-blue-500" />
-              <span className="ml-2 text-xl font-bold">DiagramAI</span>
+              <span className="ml-2 text-xl font-bold">ManimAi By Om</span>
             </div>
             <p className="mt-4 text-slate-600 dark:text-slate-300">
               Transform text into beautiful diagrams instantly with our AI-powered tool.
             </p>
             <div className="mt-6 flex space-x-4">
-              <a href="#" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
+              <a href="https://github.com/OmSharma42306"  className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
+              <a href="https://x.com/OmSharma42306" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
-                <Facebook className="h-5 w-5" />
+              <a href="https://latest-portofolio.vercel.app/" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
+                Portfolio
               </a>
-              <a href="#" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
+              <a href="https://www.linkedin.com/in/om-sharma-846733273" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
         </div>
         <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            © {new Date().getFullYear()} DiagramAI. All rights reserved.
+            © {new Date().getFullYear()} ManimAi By Om. All rights reserved.
           </p>
         </div>
       </div>
