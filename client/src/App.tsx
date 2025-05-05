@@ -1,4 +1,10 @@
 import { useState } from 'react'
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Features from './components/Features';
+import DiagramGallery from './components/DiagramGallery';
+import HowItWorks from './components/HowItWorks';
+import Footer from './components/Footer';
 
 
 function App() {
@@ -11,17 +17,29 @@ function App() {
 
 
   return (
-    <>
-    <h1>Enter Prompt</h1>
-    <br />
-    <input type="text" placeholder='Enter Prompt' onChange={(e)=>{
-      setPrompt(e.target.value);
-    }} />
-    <br />
-    <button onClick={handleSendPrompt}>Send</button>
+    <div>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100">
+      <Navbar />
+      <main>
+        <Hero />
+        <Features />
+        {/* <DiagramGallery /> */}
+        <HowItWorks />
+      </main>
+      <Footer />
+    </div>
+    </div>
+    // <>
+    // <h1>Enter Prompt</h1>
+    // <br />
+    // <input type="text" placeholder='Enter Prompt' onChange={(e)=>{
+    //   setPrompt(e.target.value);
+    // }} />
+    // <br />
+    // <button onClick={handleSendPrompt}>Send</button>
 
 
-    </>
+    // </>
   )
 }
 
