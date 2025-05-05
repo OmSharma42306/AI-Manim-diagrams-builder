@@ -4,6 +4,9 @@ import bodyParser from "body-parser";
 import { Request,Response } from "express";
 import dotenv from "dotenv";
 import Together from "together-ai";
+import * as fs from "fs";
+import path from 'path';
+
 
 dotenv.config()
 
@@ -22,19 +25,41 @@ const together = new Together({
 
 app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
     const prompt:string = req.body.prompt;
-    console.log(process.env.GPT4_API_KEY)
-    const systemPrompt = "xyz"
+    
+    const path = './src/prompts/system_prompts.txt'
+    const readfile:string|null = readFile(path);
+    //@ts-ignore
+    const systemPrompt:string = readfile;
     try{
-        // sending gpt to prompt
+        const newx = readFile('./src/generate.py')
+        console.log("NEXZZ",newx)
+
+        // sending prompt to llm
         const response = await together.chat.completions.create({
             messages: [
-                {role: "system", content: systemPrompt},
-                {"role": "user", "content": "What are some fun things to do in New York?"}],
-            model: "Qwen/Qwen3-235B-A22B-fp8-tput"
+                {"role": "system", "content": systemPrompt},
+                {"role": "user", "content": "Create a Manim animation using a CreateCircle"}],
+            model:"mistralai/Mixtral-8x7B-Instruct-v0.1"
+            //  "Qwen/Qwen3-235B-A22B-fp8-tput"
+            
           });
           
-          console.log(response?.choices[0]?.message?.content)
-          res.json({msg:response?.choices[0]?.message?.content})
+          
+          const rawCode = response?.choices[0]?.message?.content;
+          // @ts-ignore
+          const cleanedCode = sanitizeManimCode(rawCode);
+
+          console.log(cleanedCode);
+
+
+
+          //res.json({msg:response?.choices[0]?.message?.content})
+          
+        
+        //  fs.writeFileSync(outputPath, cleanedCode);
+          fs.writeFileSync('./src/generate.py',cleanedCode)
+          console.log('✅ Code written to generated_scene.py');
+          res.json(cleanedCode)
           return;
     
     }catch(error){
@@ -43,6 +68,27 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
     }
 })
 
+
+
+function sanitizeManimCode(raw: string): string {
+    return raw
+      .replace(/^\s*```(?:python)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .replace(/NEW_COMMAND_[^\n\r]*/g, '') // remove weird LLM artifacts
+      .trim();
+  }
+  
+
+
+function readFile(filePath:string):string|null{
+try{
+const data = fs.readFileSync(filePath,'utf-8');
+return data.toString();
+}catch(error){
+    console.error(error);
+    return null;
+}
+}
 
 
 app.listen(PORT,()=>{
