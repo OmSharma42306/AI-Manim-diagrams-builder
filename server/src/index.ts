@@ -58,8 +58,12 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
           
         
         //  fs.writeFileSync(outputPath, cleanedCode);
-          fs.writeFileSync('./src/generate.py',cleanedCode)
-          console.log('✅ Code written to generated_scene.py');
+        // fs.writeFileSync('./src/generate.py',cleanedCode)
+        fs.writeFileSync('.././manim-runner/manimations/main.py',cleanedCode)  
+        // .././
+          
+          
+          console.log('written to main.py');
           res.json(cleanedCode)
           return;
     
