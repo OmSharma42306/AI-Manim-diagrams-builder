@@ -63,31 +63,14 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
           console.log('written to main.py');
 
           const filePath = '../manim-runner/manimations/main.py';
-          
-          // runManim((err, outputPath) => {
-          //   if (err || !outputPath) {
-          //     return res.status(500).json({ error: 'Manim failed to render the video.' });
-          //   }
-      
-          //   res.sendFile(outputPath, err => {
-          //     if (err) {
-          //       console.error("Error sending file:", err);
-          //       res.status(500).end();
-          //     } else {
-          //       console.log("✅ Video sent.");
-          //     }
-          //   });
-          // });
+
           runManim((error, videoPath) => {
             if (error || !videoPath) {
               return res.status(500).json({ error: "Failed to render video" });
             }
-        
-  
-        
-            res.json({ url: "" });
+            res.json({ url: "hi" });
+            return;
           });
-          
           //res.json(cleanedCode)
           return;
     
@@ -98,66 +81,84 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
 })
 
 
-
-
   // todo working..
 
   const runManim = async (callback: (error: any, outputPath?: string) => void) => {
+    
     const workingDir = path.resolve('../manim-runner/manimations');
-    const destinDir = '../videos'
     const command = `manim -pql main.py GeneratedScene --format=mp4`;
+    const renderedPath = path.resolve(workingDir, 'media/videos/main/480p15/GeneratedScene.mp4');
+    const targetPath = path.resolve(__dirname, 'public/videos/GeneratedScene.mp4');
+    const videoPath = '../manim-runner/manimations/media/videos/main/480p15/GeneratedScene.mp4';
+    
+    // working exec
+  //   exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
+  //     if (error) {
+  //       console.error(`Manim execution error: ${stderr}`);
+  //       return callback(error);
+  //     }
 
-    exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Manim execution error: ${stderr}`);
-        return callback(error);
-      }
-
-      try {
-        console.log("i am hrere")
-        // const pattern = path.join(workingDir, 'media/videos/main/**/GeneratedScene.mp4');
-        const pattern = path.join(workingDir, destinDir);
+  //     try {
         
-        // console.log("Pattern: ",pattern)
-        // const files = await glob(pattern);
-        // console.log("Files: ",files)
-        // if (files.length === 0) {
-        //   return callback(new Error(" Rendered video not found"));
-        // }
+        
 
-        // const renderedPath = files[0];
-        // const destinationPath = path.resolve('../videos/GeneratedScene.mp4');
+  //     } catch (globErr) {
+  //       return callback(globErr);
+  //     }
+  
+  //   });
+  // };
 
-        // fs.copyFile(renderedPath, destinationPath, (copyErr) => {
-        //   if (copyErr) {
-        //     console.error("Error copying file:", copyErr);
-        //     return callback(copyErr);
-        //   }
+  exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
+    if (error) {
+      console.error(`❌ Manim execution error: ${stderr}`);
+      return callback(error);
+    }
 
-        //   console.log(" Video copied to:", destinationPath);
-       //   callback(null, destinationPath);
-        //});
-      } catch (globErr) {
-        return callback(globErr);
+
+ // Check if output exists
+ fs.access(renderedPath, fs.constants.F_OK, (err) => {
+  if (err) {
+    console.error("❌ Rendered video not found:", renderedPath);
+    return callback(err);
+  }
+
+  // Ensure the target directory exists
+  fs.mkdir(path.dirname(targetPath), { recursive: true }, (mkdirErr) => {
+    if (mkdirErr) {
+      console.error("❌ Failed to create target directory:", mkdirErr);
+      return callback(mkdirErr);
+    }
+
+    // Move (or copy) the file
+    fs.copyFile(renderedPath, targetPath, (copyErr) => {
+      if (copyErr) {
+        console.error("❌ Failed to copy file:", copyErr);
+        return callback(copyErr);
       }
-      // Directly return the expected output path (don't glob)
-      // const outputPath = path.join(
-      //   workingDir,
-      //   'media',
-      //   'videos',
-      //   'main',
-      //   '480p15',
-      //   'GeneratedScene.mp4'
-      // );
 
-      // console.log("Video generated at:", outputPath);
-      
-//      callback(null, outputPath);
+      console.log("✅ Video copied to:", targetPath);
+      return callback(null, targetPath);
     });
-  };
+  });
+});
+});
+  }
 
 
-function sanitizeManimCode(raw: string): string {
+
+
+
+
+
+
+
+
+
+
+
+
+  function sanitizeManimCode(raw: string): string {
     return raw
       .replace(/^\s*```(?:python)?\s*/i, '')
       .replace(/\s*```$/i, '')
@@ -183,7 +184,6 @@ function sanitizeManimCode(raw: string): string {
     return raw.trim();
   }
   
-
 
 function readFile(filePath:string):string|null{
 try{
