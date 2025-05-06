@@ -13,14 +13,26 @@ const PromptInput: React.FC<PromptInputProps> = ({
   placeholder = 'Enter your prompt...',
 }) => {
   const [prompt, setPrompt] = useState('');
+  // const [isGenerating, setIsGenerating] = useState(false);
+  // const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (prompt.trim() && !isProcessing) {
+
+      // try{
+      //   setIsGenerating(true);
+      //   const data = await sendPrompt(prompt);
+      //   console.log(data.url)
+      //   setVideoUrl(data.url)
+      // }catch(error){
+      //   console.error(error);
+      // setError('Failed to generate video.');
+      // }
       onSubmit(
-      await sendPrompt(prompt.trim())
-      
     
+        await sendPrompt(prompt.trim())
     );
 
     }

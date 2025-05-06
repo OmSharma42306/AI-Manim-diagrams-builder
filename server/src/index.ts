@@ -19,6 +19,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const videoOutputDir = path.resolve(__dirname, 'public/videos');
+
+app.use('/video', express.static(videoOutputDir));
 
 const together = new Together({
     apiKey: process.env.GPT4_API_KEY,
@@ -68,7 +71,8 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
             if (error || !videoPath) {
               return res.status(500).json({ error: "Failed to render video" });
             }
-            res.json({ url: "hi" });
+            const url = 'http://localhost:3000/video/GeneratedScene.mp4'
+            res.json({ url: url });
             return;
           });
           //res.json(cleanedCode)

@@ -2,23 +2,23 @@ from manim import *
 
 class GeneratedScene(Scene):
     def construct(self):
-        sender_text = Text("Sender").scale(2)
-        server_text = Text("Email Server (SMTP)").scale(2)
-        receiver_text = Text("Receiver").scale(2)
+        triangle = Polygon(
+            start=DOWN,
+            end=UP,
+            color=YELLOW,
+            stroke_width=2,
+            fill_opacity=1
+        )
 
-        sender_square = Square(side_length=4).shift(LEFT * 4)
-        server_square = Square(side_length=4).shift(UP * 3)
-        receiver_square = Square(side_length=4).shift(RIGHT * 4)
+        label_a = Tex("A").next_to(triangle.points[0], DOWN)
+        label_b = Tex("B").next_to(triangle.points[1], UP)
+        label_c = Tex("C").next_to(triangle.points[2], LEFT)
 
-        sender_arrow = Arrow(sender_square.get_right(), server_square.get_left(), color=YELLOW)
-        server_arrow = Arrow(server_square.get_right(), receiver_square.get_left(), color=TEAL)
+        self.play(
+            Create(triangle),
+            Write(label_a),
+            Write(label_b),
+            Write(label_c)
+        )
 
-        self.play(Write(sender_text), Write(sender_square))
-        self.play(Write(server_text), Write(server_square))
-        self.play(Write(receiver_text), Write(receiver_square))
-
-        sender_arrow.put_start_and_end_on(sender_square.get_right(), server_square.get_left())
-        server_arrow.put_start_and_end_on(server_square.get_right(), receiver_square.get_left())
-
-        self.play(Create(sender_arrow), Create(server_arrow))
         self.wait(1)
