@@ -7,7 +7,7 @@ import Together from "together-ai";
 import * as fs from "fs";
 import path from 'path';
 import { exec } from 'child_process';
-
+import {S3Client,PutObjectCommand} from "@aws-sdk/client-s3"
 
 dotenv.config()
 
@@ -25,6 +25,17 @@ app.use('/video', express.static(videoOutputDir));
 const together = new Together({
     apiKey: process.env.GPT4_API_KEY,
   }); // auth defaults to process.env.TOGETHER_API_KEY
+
+
+// AWS S3 STUFF...
+const s3 = new S3Client({
+  region:process.env.AWS_REGION!,
+  credentials:{
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+})  
+
 
 
 app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
@@ -61,8 +72,9 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
             if (error || !videoPath) {
               return res.status(500).json({ error: "Failed to render video" });
             }
-            const url = 'http://localhost:3000/video/GeneratedScene.mp4'
-            res.json({ url: url });
+            console.log("VIDEO PATH :      ",videoPath)
+            // const url = 'http://localhost:3000/video/GeneratedScene.mp4'
+            res.json({ url: videoPath });
             return;
           });
           return;
@@ -74,34 +86,16 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
 })
 
 
-  // todo working..
-
+  
+// Function to Run Manim code 
   const runManim = async (callback: (error: any, outputPath?: string) => void) => {
     
     const workingDir = path.resolve('../manim-runner/manimations');
     const command = `manim -pql main.py GeneratedScene --format=mp4`;
     const renderedPath = path.resolve(workingDir, 'media/videos/main/480p15/GeneratedScene.mp4');
-    const targetPath = path.resolve(__dirname, 'public/videos/GeneratedScene.mp4');
-    const videoPath = '../manim-runner/manimations/media/videos/main/480p15/GeneratedScene.mp4';
+    const targetPath = '../manim-runner/manimations/media/videos/main/480p15/GeneratedScene.mp4'
     
-    // working exec
-  //   exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
-  //     if (error) {
-  //       console.error(`Manim execution error: ${stderr}`);
-  //       return callback(error);
-  //     }
-
-  //     try {
-        
-        
-
-  //     } catch (globErr) {
-  //       return callback(globErr);
-  //     }
-  
-  //   });
-  // };
-
+    
   exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
     if (error) {
       console.error(`Manim execution error: ${stderr}`);
@@ -109,6 +103,12 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
       return callback(error);
     }
 
+    // Uploading to S3 Bucket...
+    const s3Url = await uploadToS3(targetPath,`videos/${Date.now()}-GeneratedScene.mp4`);
+    console.log("s3 URL",s3Url);
+
+
+ // These stuff for local video testing....
 
  // Check if output exists
  fs.access(renderedPath, fs.constants.F_OK, (err) => {
@@ -133,12 +133,32 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
 
       console.log("Video copied to:", targetPath);
       
-      return callback(null, targetPath);
+      return callback(null, s3Url);
     });
   });
 });
 });
   }
+
+
+// Function to Upload video to S3
+async function uploadToS3(localpath:string,fileName:string){
+  const fileContent = fs.readFileSync(localpath);
+  const uploadCommand = new PutObjectCommand({
+    Bucket:process.env.S3_BUCKET_NAME!,
+    Key:fileName,
+    Body:fileContent,
+    ContentType:"video/mp4",
+  })
+
+  await s3.send(uploadCommand)
+
+
+  const s3Url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+  console.log(s3Url)
+  return s3Url;
+
+}
 
 
 
