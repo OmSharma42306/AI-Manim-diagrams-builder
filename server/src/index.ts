@@ -7,7 +7,6 @@ import Together from "together-ai";
 import * as fs from "fs";
 import path from 'path';
 import { exec } from 'child_process';
-import {glob} from 'glob';
 
 
 dotenv.config()
@@ -54,18 +53,9 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
         //   const secondSanitized = sanitizeManimCode2(cleanedCode)
           console.log(cleanedCode);
 
-          //res.json({msg:response?.choices[0]?.message?.content})
-          
+          fs.writeFileSync('.././manim-runner/manimations/main.py',cleanedCode)  
         
-        
-        fs.writeFileSync('.././manim-runner/manimations/main.py',cleanedCode)  
-        
-     
-
-          
           console.log('written to main.py');
-
-          const filePath = '../manim-runner/manimations/main.py';
 
           runManim((error, videoPath) => {
             if (error || !videoPath) {
@@ -75,7 +65,6 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
             res.json({ url: url });
             return;
           });
-          //res.json(cleanedCode)
           return;
     
     }catch(error){
@@ -115,7 +104,8 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
 
   exec(command, { cwd: workingDir }, async (error, stdout, stderr) => {
     if (error) {
-      console.error(`❌ Manim execution error: ${stderr}`);
+      console.error(`Manim execution error: ${stderr}`);
+      
       return callback(error);
     }
 
@@ -123,25 +113,26 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
  // Check if output exists
  fs.access(renderedPath, fs.constants.F_OK, (err) => {
   if (err) {
-    console.error("❌ Rendered video not found:", renderedPath);
+    console.error("Rendered video not found:", renderedPath);
     return callback(err);
   }
 
   // Ensure the target directory exists
   fs.mkdir(path.dirname(targetPath), { recursive: true }, (mkdirErr) => {
     if (mkdirErr) {
-      console.error("❌ Failed to create target directory:", mkdirErr);
+      console.error("Failed to create target directory:", mkdirErr);
       return callback(mkdirErr);
     }
 
     // Move (or copy) the file
     fs.copyFile(renderedPath, targetPath, (copyErr) => {
       if (copyErr) {
-        console.error("❌ Failed to copy file:", copyErr);
+        console.error("Failed to copy file:", copyErr);
         return callback(copyErr);
       }
 
-      console.log("✅ Video copied to:", targetPath);
+      console.log("Video copied to:", targetPath);
+      
       return callback(null, targetPath);
     });
   });
@@ -151,16 +142,7 @@ app.post("/api/v1/prompt",async(req:Request,res:Response)=>{
 
 
 
-
-
-
-
-
-
-
-
-
-
+// sanitize response stuff
 
   function sanitizeManimCode(raw: string): string {
     return raw
