@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { sendPrompt } from '../api/api';
+
 interface PromptInputProps {
   onSubmit: (prompt: string) => void;
   isProcessing: boolean;
   placeholder?: string;
 }
+
+
 
 const PromptInput: React.FC<PromptInputProps> = ({
   onSubmit,
@@ -13,32 +16,27 @@ const PromptInput: React.FC<PromptInputProps> = ({
   placeholder = 'Enter your prompt...',
 }) => {
   const [prompt, setPrompt] = useState('');
-  // const [isGenerating, setIsGenerating] = useState(false);
-  // const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  // const [error, setError] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  
+  
+
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (prompt.trim() && !isProcessing) {
-
-      // try{
-      //   setIsGenerating(true);
-      //   const data = await sendPrompt(prompt);
-      //   console.log(data.url)
-      //   setVideoUrl(data.url)
-      // }catch(error){
-      //   console.error(error);
-      // setError('Failed to generate video.');
-      // }
-      onSubmit(
-    
-        await sendPrompt(prompt.trim())
-    );
-
+      try{
+        const res = await sendPrompt(prompt.trim()); 
+        console.log("RESP",res)
+      setVideoUrl(res.url);
+  
+      }catch(error){
+        console.error(error)
+      }
     }
   };
 
   return (
+    <div>
     <div className="relative group">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
       <form
@@ -69,7 +67,22 @@ const PromptInput: React.FC<PromptInputProps> = ({
           )}
         </button>
       </form>
+      
+    
+    
+    
     </div>
+
+    {videoUrl && (
+  <div className="mt-4">
+    <video autoPlay controls className="w-full max-w-lg rounded-lg shadow">
+      <source src={videoUrl} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+)}
+    </div>
+    
   );
 };
 
